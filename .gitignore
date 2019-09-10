@@ -241,9 +241,6 @@ TSWLatexianTemp*
 # generated if using elsarticle.cls
 *.spl
 
-<<<<<<< HEAD
 #Mac OS ignores
 .DS_Store
-=======
-.DS_Store
->>>>>>> 1fffe53d7450cc26ab8299b78801606ccb4c9fed
+
