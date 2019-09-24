@@ -12,6 +12,7 @@
 % For strikethrough effect
 \usepackage[normalem]{ulem}
 \usepackage{wasysym}
+\usepackage{graphicx} %package to manage images
 
 \usepackage{pdfpages}
 
@@ -21,39 +22,43 @@
 \input{sessioninfo}
 
 \begin{document}
-\title{\sessionnumber: Computing Foundations}
+\title{\sessionnumber: Module Introduction}
 \subtitle{\modulecode: \moduletitle}
+
+\begin{frame}
+	\includegraphics[width=1.0\textwidth]{sign-in}
+\end{frame}
 
 \frame{\titlepage} 
 
-\begin{frame}{Learning outcomes}
-	By the end of today's session, you will be able to:
-	\begin{itemize}
-		\item \textbf{Describe} the overall structure of the module and its assessments
-		\item \textbf{Recall} the historical context of computing and gaming technology
-		\item \textbf{Explain} the basic architecture of a computer
-	\end{itemize}
+
+
+\begin{frame}
+	\begin{columns}
+		\column{0.5\textwidth}
+		\includegraphics[width=1.0\textwidth]{brian_mcdonald}
+		\column{0.5\textwidth}
+		\begin{itemize}
+			\item Brian McDonald
+			\item brian.mcdonald@falmouth.ac.uk
+			\item Please contact me with any issues at all!
+		\end{itemize}
+	\end{columns}
 \end{frame}
 
 \begin{frame}{Today's agenda}
 	\begin{itemize}
-		\item COMP110 course outline
-		\item History of computing
+		\item GAM702 course outline
+		\item GAM702 assignment
+		\item First brief
 	\end{itemize}
 \end{frame}
 
 \input{courseintro}
+\input{resources}
 
-\input{history}
-
-\begin{frame}{Debrief}
-	\pause You should now be able to:
-	\begin{itemize}
-		\item \textbf{Describe} the overall structure of the module and its assessments
-		\item \textbf{Recall} the historical context of computing and gaming technology
-		\item \textbf{Explain} the basic architecture of a computer
-	\end{itemize}
-	\pause \textbf{Remember:} Worksheet A is due \textbf{next week}!
+\begin{frame}{First Prototype - Theme Announcement}
+	\url{http://youtube.com}
 \end{frame}
 
 \end{document}
