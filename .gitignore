@@ -241,8 +241,11 @@ TSWLatexianTemp*
 # generated if using elsarticle.cls
 *.spl
 
-#Mac OS ignores
+# Mac OS ignores
 .DS_Store
 
+# MS Office temporary files
+~$*
 
-COMP704/~$cture plans.docx
+# TeXnicCenter settings files
+*.tps

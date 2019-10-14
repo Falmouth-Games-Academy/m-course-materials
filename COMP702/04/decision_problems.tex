@@ -1,0 +1,57 @@
+\part{Markov decision processes and games}
+\frame{\partpage}
+
+\begin{frame}{Markov decision processes}
+	\begin{itemize}
+		\pause\item A \textbf{Markov decision process (MDP)} is defined by:
+			\begin{itemize}
+				\pause\item A finite set $S$ of \textbf{states};
+				\pause\item A finite set $A$ of \textbf{actions};
+				\pause\item $P(s, a, s')$ is the \textbf{probability} that action $a$ in state $s$ leads to state $s'$;
+				\pause\item $R(s, a, s')$ is the \textbf{reward} received from performing action $a$ in state $s$ and ending up in state $s'$.
+			\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{The Markov property}
+	\begin{itemize}
+		\pause\item Given a state $s$ and an action $a$, the next state $s'$ is determined by $P(s, a, s')$
+		\pause\item The previous states before $s$ have no effect
+		\pause\item Hence an MDP is ``memoryless''
+		\pause\item (Or rather, any memory has to be contained within the state)
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{(Non)determinism}
+	\begin{itemize}
+		\pause\item MDP defines $P(s, a, s')$
+		\pause\item From state $s$ and action $a$, there may be several possible states $s'$
+		\pause\item MDPs are \textbf{nondeterministic} i.e.\ \textbf{stochastic}
+		\pause\item If we have
+			$$ P(s, a, s') = \begin{cases}
+				1 &\quad\text{for some $s'$} \\
+				0 &\quad\text{for all other $s'$}
+			\end{cases} $$
+			then the MDP is \textbf{deterministic}
+		\pause\item In the deterministic case, the same state $s$ and action $a$ always leads to the same state $s'$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Markov decision problems}
+	\begin{itemize}
+		\pause\item A \textbf{policy} for an MDP is a function $\pi : S \to A$
+		\pause\item I.e.\ in state $s$, choose action $a = \pi(s)$
+		\pause\item Goal: find $\pi$ which maximises the total reward over time
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Multi-agent MDPs}
+	\begin{itemize}
+		\pause\item We have assumed a \textbf{single agent} choosing a policy $\pi$
+		\pause\item We can extend to $n$ agents choosing policies $\pi_1, \dots, \pi_n$
+		\pause\item The ``action'' is now a combination $(a_1, \dots, a_n)$ of all the agents' actions
+		\pause\item Each agent has their own reward function and is trying to maximise it
+		\pause\item This is a \textbf{game}!
+	\end{itemize}
+\end{frame}
+
