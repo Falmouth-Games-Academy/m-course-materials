@@ -55,18 +55,32 @@
     \end{center}
 \end{frame}
 
+\begin{frame}{Pathfinding as search}
+    \begin{itemize}
+        \pause\item Basic idea: build a \textbf{spanning tree} for the graph
+        \pause\item Root node is $A$ (the start node)
+        \pause\item Edges in the tree are a \textbf{subset} of edges of the graph
+        \pause\item Once the tree includes $B$, we can read off the path from $A$ to $B$
+        \pause\item Need to keep track of two sets of nodes:
+            \begin{itemize}
+                \pause\item \textbf{Open set}: nodes within 1 edge of the tree, which could be added next
+                \pause\item \textbf{Closed set}: nodes which have been added to the tree, and shouldn't be revisited
+                    (otherwise we could get stuck in an infinite loop)
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
 \begin{frame}{Graph traversal}
 	\begin{itemize}
 		\pause\item \textbf{Depth-first} or \textbf{breadth-first}
-		\pause\item Can be implemented with a \textbf{stack} or a \textbf{queue} respectively
-		\pause\item For graphs (as opposed to trees), need to remember which nodes have been \textbf{visited}
-			to avoid getting stuck in a loop
+		\pause\item Can be implemented with the open set as a \textbf{stack} or a \textbf{queue} respectively
 		\pause\item Inefficient --- generally has to explore the \textbf{entire map}
 		\pause\item Finds a path, but probably not the \textbf{shortest}
 		\pause\item Third type of traversal: \textbf{best-first}
 			\begin{itemize}
 				\pause\item ``Best'' according to some heuristic evaluation
-				\pause\item Often implemented with a \textbf{priority queue}
+				\pause\item Often implemented with the open set as a \textbf{priority queue} ---
+				    a data structure optimised for finding the \textbf{highest priority} item
 			\end{itemize}
 	\end{itemize}
 \end{frame}
@@ -75,6 +89,7 @@
 	\begin{itemize}
 		\pause\item Always try to move \textbf{closer} to the goal
 		\pause\item Visit the node whose \textbf{distance to the goal} is \textbf{minimal}
+		\pause\item E.g.\ \textbf{Euclidean} distance (straight line distance --- Pythagoras' Theorem)
 		\pause\item Doesn't handle \textbf{dead ends} well
 		\pause\item Not guaranteed to find the \textbf{shortest} path
 	\end{itemize}
@@ -82,7 +97,7 @@
 
 \begin{frame}{Dijkstra's algorithm}
 	\begin{itemize}
-		\pause\item Let $g(x)$ be the distance of the path found from the start to $x$
+		\pause\item Let $g(x)$ be the sum of edge weights of the path found from the start to $x$
 		\pause\item Choose a node that minimises $g(x)$
 		\pause\item Needs to handle cases where a shorter path to a node is discovered later in the search
 		\pause\item \textbf{Is} guaranteed to find the shortest path

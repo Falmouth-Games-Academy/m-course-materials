@@ -123,6 +123,29 @@ def a_star_search(the_map, screen, heuristic):
         pygame.event.get()
 
 
+def string_pull(the_map, screen, path):
+    while True:
+        for i in range(1, len(path)-1):
+            if the_map.is_unobstructed(path[i-1].pos, path[i+1].pos):
+                del path[i]
+                break  # out of the for loop
+        else:
+            break  # out of the while loop
+
+        screen.fill((255, 255, 255))
+
+        the_map.draw(screen)
+        for i in range(1, len(path)):
+            pygame.draw.line(screen, (0, 0, 0), path[i - 1].pos, path[i].pos, 6)
+
+        for node in path:
+            node.draw(screen, (0, 0, 0), 8)
+
+        pygame.display.flip()
+        time.sleep(0.1)
+        pygame.event.get()
+
+
 def main():
     tile_size = 50
 
@@ -155,9 +178,10 @@ def main():
         # A*
         #path = a_star_search(the_map, screen, map.euclidean_distance)
 
-        screen.fill((255, 255, 255))
+        #screen.fill((255, 255, 255))
 
-        the_map.draw(screen)
+        #the_map.draw(screen)
+
         if path is not None:
             for i in range(1, len(path)):
                 pygame.draw.line(screen, (0, 0, 0), path[i - 1].pos, path[i].pos, 6)
@@ -168,6 +192,23 @@ def main():
             event = pygame.event.wait()
             if event.type == pygame.QUIT or event.type == pygame.KEYDOWN:
                 break
+
+        do_string_pull = False
+        if path is not None and do_string_pull:
+            string_pull(the_map, screen, path)
+
+            for i in range(1, len(path)):
+                pygame.draw.line(screen, (0, 0, 0), path[i - 1].pos, path[i].pos, 6)
+
+            for node in path:
+                node.draw(screen, (0, 0, 0), 8)
+
+            pygame.display.flip()
+
+            while True:
+                event = pygame.event.wait()
+                if event.type == pygame.QUIT or event.type == pygame.KEYDOWN:
+                    break
 
 
 if __name__ == '__main__':
