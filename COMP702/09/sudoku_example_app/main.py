@@ -6,6 +6,26 @@ import copy
 tile_size = 70
 
 
+def slow_sleep():
+    pygame.display.flip()
+    time.sleep(0.5)
+    pygame.event.get()
+
+
+last_sleep_time = time.perf_counter()
+
+
+def fast_sleep():
+    global last_sleep_time
+    if time.perf_counter() - last_sleep_time > 0.1:
+        pygame.display.flip()
+        pygame.event.get()
+        last_sleep_time = time.perf_counter()
+
+
+sleep = slow_sleep
+#sleep = fast_sleep
+
 
 class Board:
     def __init__(self, filename):
@@ -88,6 +108,13 @@ class Board:
         else:
             return True
 
+    def is_solved(self):
+        for y in range(9):
+            for x in range(9):
+                if type(self.numbers[x][y]) is not int:
+                    return False
+        return True
+
 
 def solve_backtracking(screen, board, x, y):
     potential_values = range(1, 10)
@@ -106,9 +133,7 @@ def solve_backtracking(screen, board, x, y):
 
         board.draw(screen)
         pygame.draw.rect(screen, (0, 255, 0), pygame.Rect(x * tile_size, y * tile_size, tile_size, tile_size), 3)
-        pygame.display.flip()
-        time.sleep(0.1)
-        pygame.event.get()
+        sleep()
 
 
         if board.is_valid() and (next_y == 9 or solve_backtracking(screen, board, next_x, next_y)):
@@ -152,9 +177,7 @@ def solve_constraint_propagation(screen, board):
 
                     board.draw(screen)
                     pygame.draw.rect(screen, (0, 255, 0), pygame.Rect(x * tile_size, y * tile_size, tile_size, tile_size), 3)
-                    pygame.display.flip()
-                    time.sleep(0.3)
-                    pygame.event.get()
+                    sleep()
 
     return True
 
@@ -178,9 +201,7 @@ def solve_combined_bt(screen, board, x, y):
 
         board.draw(screen)
         pygame.draw.rect(screen, (0, 255, 0), pygame.Rect(x * tile_size, y * tile_size, tile_size, tile_size), 3)
-        pygame.display.flip()
-        time.sleep(0.1)
-        pygame.event.get()
+        sleep()
 
         if solve_combined(screen, board):
             return True
@@ -194,18 +215,10 @@ def solve_combined(screen, board):
     if not solve_constraint_propagation(screen, board):
         return False
 
-    is_unsolved = False
-    for y in range(9):
-        for x in range(9):
-            if type(board.numbers[x][y]) is list:
-                is_unsolved = True
-                if len(board.numbers[x][y]) == 0:
-                    return False
-
-    if is_unsolved:
-        return solve_combined_bt(screen, board, 0, 0)
-    else:
+    if board.is_solved():
         return True
+    else:
+        return solve_combined_bt(screen, board, 0, 0)
 
 
 def main():
