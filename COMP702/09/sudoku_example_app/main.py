@@ -108,6 +108,8 @@ def solve_backtracking(screen, board, x, y):
         pygame.draw.rect(screen, (0, 255, 0), pygame.Rect(x * tile_size, y * tile_size, tile_size, tile_size), 3)
         pygame.display.flip()
         time.sleep(0.1)
+        pygame.event.get()
+
 
         if board.is_valid() and (next_y == 9 or solve_backtracking(screen, board, next_x, next_y)):
             return True
@@ -152,6 +154,7 @@ def solve_constraint_propagation(screen, board):
                     pygame.draw.rect(screen, (0, 255, 0), pygame.Rect(x * tile_size, y * tile_size, tile_size, tile_size), 3)
                     pygame.display.flip()
                     time.sleep(0.3)
+                    pygame.event.get()
 
     return True
 
@@ -177,6 +180,7 @@ def solve_combined_bt(screen, board, x, y):
         pygame.draw.rect(screen, (0, 255, 0), pygame.Rect(x * tile_size, y * tile_size, tile_size, tile_size), 3)
         pygame.display.flip()
         time.sleep(0.1)
+        pygame.event.get()
 
         if solve_combined(screen, board):
             return True
