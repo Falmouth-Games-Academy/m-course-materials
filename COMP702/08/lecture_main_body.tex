@@ -15,24 +15,23 @@
 
 \usepackage{pdfpages}
 
+\usepackage{algpseudocode}
+
 % http://www.texample.net/tikz/examples/state-machine/
 \usetikzlibrary{arrows,automata}
 
 \input{sessioninfo}
 
 \begin{document}
-\title{\sessionnumber: Session title here}
+\title{\sessionnumber: Planning}
 \subtitle{\modulecode: \moduletitle}
 
 \frame{\titlepage} 
 
-\begin{frame}
-	\frametitle{Learning outcomes}
-	\begin{itemize}
-		\item Outcome 1
-		\item Outcome 2
-		\item Outcome 3
-	\end{itemize}
-\end{frame}
+\input{planning}
+\input{goap}
+
+\part{Workshop}
+\frame{\partpage}
 
 \end{document}

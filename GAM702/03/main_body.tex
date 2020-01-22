@@ -1,52 +1,73 @@
 % Adjust these for the path of the theme and its graphics, relative to this file
 %\usepackage{beamerthemeFalmouthGamesAcademy}
 \usepackage{../../beamerthemeFalmouthGamesAcademy}
-\usepackage[utf8]{inputenc}
 \usepackage{multimedia}
 \graphicspath{ {../../} }
 
 % Default language for code listings
-\lstset{language=Python
+\lstset{language=C++,
+        morekeywords={each,in,nullptr}
 }
 
 % For strikethrough effect
 \usepackage[normalem]{ulem}
 \usepackage{wasysym}
-
-\usepackage{algpseudocode}
+\usepackage{graphicx} %package to manage images
 
 \usepackage{pdfpages}
 
 % http://www.texample.net/tikz/examples/state-machine/
 \usetikzlibrary{arrows,automata}
 
+
 \input{sessioninfo}
 
 \begin{document}
-\title{\sessionnumber: Flowcharts and pseudocode}
+\title{\sessionnumber: Physical Prototyping}
 \subtitle{\modulecode: \moduletitle}
+
+\begin{frame}
+	\includegraphics[width=1.0\textwidth]{sign-in}
+\end{frame}
 
 \frame{\titlepage} 
 
-\begin{frame}
-	\frametitle{Learning outcomes}
+
+\begin{frame}{Today's agenda}
 	\begin{itemize}
-		\item Explain and use basic data types
-		\item Recall some basic algorithms
-		\item Produce and explain basic flowcharts
-		\item Produce and explain basic pseudocode
+		\item Prototype Due Date
+		\item Design Goals
+		\item Physical Prototyping
 	\end{itemize}
 \end{frame}
 
-\input{datatypes}
-\input{algorithm}
-\input{flowcharts}
-\input{pseudocode}
+\begin{frame}{First Prototype - DIY}
+\begin{center}
+	\Huge{Due Today 5pm!}
+\end{center}
+\end{frame}
 
-\begin{frame}{Worksheet B}
+\input{design_goals}
+\input{paper_prototyping}
+
+\begin{frame}{Second Prototype - Theme Announcement}
+\begin{center}
+	\Huge{Due Friday 5pm on Week 5!}
+\end{center}
+\end{frame}
+
+\begin{frame}{References}
 	\begin{itemize}
-		\item Flowcharts and pseudocode
-		\item Due in class \textbf{next Tuesday}
+		\item Fullerton, T., 2018. Game design workshop: a playcentric approach to creating innovative games. AK Peters/CRC Press.
+		\item Building a Paper Prototype For Your Narrative Design - \url{https://www.youtube.com/watch?v=taxcb_5lEI8}
+		\item \url{https://perspectivesingamedesign.com/paper-prototyping-and-iterative-design-part-1-b962affcd281}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\begin{itemize}
+		\item Innovation Through Better Design Pillars \url{https://www.gdcvault.com/browse/gdc-17/play/1024176}
+		\item One-Page Designs \url{https://www.gdcvault.com/play/1012356/One-Page}	
 	\end{itemize}
 \end{frame}
 
