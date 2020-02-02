@@ -249,3 +249,25 @@ TSWLatexianTemp*
 
 # TeXnicCenter settings files
 *.tps
+
+COMP704/02/workshop/breakout/.idea/
+
+COMP704/02/workshop/example-code/.idea/
+
+COMP704/02/workshop/example-code/fileio/.idea/
+
+COMP704/02/workshop/example-code/fileio/demofile2.txt
+
+COMP704/02/workshop/example-code/fileio/eggs.csv
+
+COMP704/02/workshop/example-code/fileio/fileio_example.py
+
+COMP704/02/workshop/example-code/fileio/sample.xlsx
+
+COMP704/02/workshop/example-code/pysqlite/.idea/
+
+COMP704/02/workshop/example-code/simple clientserver/client/.idea/
+
+COMP704/02/workshop/example-code/simple clientserver/server/.idea/
+
+COMP704/02/workshop/example-code/simplejson/.idea/
