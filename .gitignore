@@ -249,27 +249,12 @@ TSWLatexianTemp*
 
 # TeXnicCenter settings files
 *.tps
+*.`-*.pptx
+*.`-*.pdf
+COMP704/01/._COMP704_01_lecture.pptx
 
-COMP704/02/workshop/breakout/.idea/
+COMP702/01/._2019-20-COMP702-01-lecture-materials.pdf
 
-COMP704/02/workshop/example-code/.idea/
+COMP704/01/._COMP704_01_lecture.pdf
 
-COMP704/02/workshop/example-code/fileio/.idea/
-
-COMP704/02/workshop/example-code/fileio/demofile2.txt
-
-COMP704/02/workshop/example-code/fileio/eggs.csv
-
-COMP704/02/workshop/example-code/fileio/fileio_example.py
-
-COMP704/02/workshop/example-code/fileio/sample.xlsx
-
-COMP704/02/workshop/example-code/pysqlite/.idea/
-
-COMP704/02/workshop/example-code/simple clientserver/client/.idea/
-
-COMP704/02/workshop/example-code/simple clientserver/server/.idea/
-
-COMP704/02/workshop/example-code/simplejson/.idea/
-
-COMP704/03/2019-20-COMP704-02-lecture.pptx
+COMP704/01/._2019-20-COMP704-01-lecture.pptx
