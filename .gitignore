@@ -249,31 +249,6 @@ TSWLatexianTemp*
 
 # TeXnicCenter settings files
 *.tps
-
-COMP704/02/workshop/breakout/.idea/
-
-COMP704/02/workshop/example-code/.idea/
-
-COMP704/02/workshop/example-code/fileio/.idea/
-
-COMP704/02/workshop/example-code/fileio/demofile2.txt
-
-COMP704/02/workshop/example-code/fileio/eggs.csv
-
-COMP704/02/workshop/example-code/fileio/fileio_example.py
-
-COMP704/02/workshop/example-code/fileio/sample.xlsx
-
-COMP704/02/workshop/example-code/pysqlite/.idea/
-
-COMP704/02/workshop/example-code/simple clientserver/client/.idea/
-
-COMP704/02/workshop/example-code/simple clientserver/server/.idea/
-
-COMP704/02/workshop/example-code/simplejson/.idea/
-
-COMP704/03/2019-20-COMP704-02-lecture.pptx
-
-COMP704/04/workshop/1.houseprice regression model/.idea/
-
-COMP704/04/workshop/2.houseprice classification model/.idea/
+*.`-*.pptx
+*.`-*.pdf
+.idea
