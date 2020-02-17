@@ -252,3 +252,6 @@ TSWLatexianTemp*
 *.`-*.pptx
 *.`-*.pdf
 .idea
+
+._*.pdf
+._*.pptx
