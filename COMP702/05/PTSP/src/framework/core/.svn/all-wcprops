@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/epowley/!svn/ver/1041/ptsp_cig12/PTSP/src/framework/core
+END
+GameObject.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/epowley/!svn/ver/1041/ptsp_cig12/PTSP/src/framework/core/GameObject.java
+END
+PTSPView.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/epowley/!svn/ver/1041/ptsp_cig12/PTSP/src/framework/core/PTSPView.java
+END
+Controller.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/epowley/!svn/ver/1041/ptsp_cig12/PTSP/src/framework/core/Controller.java
+END
+PTSPConstants.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/epowley/!svn/ver/1041/ptsp_cig12/PTSP/src/framework/core/PTSPConstants.java
+END
+Ship.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/epowley/!svn/ver/1041/ptsp_cig12/PTSP/src/framework/core/Ship.java
+END
+Exec.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/epowley/!svn/ver/1041/ptsp_cig12/PTSP/src/framework/core/Exec.java
+END
+Game.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/epowley/!svn/ver/1041/ptsp_cig12/PTSP/src/framework/core/Game.java
+END
+Waypoint.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/epowley/!svn/ver/1041/ptsp_cig12/PTSP/src/framework/core/Waypoint.java
+END
+Map.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/epowley/!svn/ver/1041/ptsp_cig12/PTSP/src/framework/core/Map.java
+END

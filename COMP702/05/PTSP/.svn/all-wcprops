@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/svn/epowley/!svn/ver/1042/ptsp_cig12/PTSP
+END
+.classpath
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/epowley/!svn/ver/1041/ptsp_cig12/PTSP/.classpath
+END
+.project
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/epowley/!svn/ver/1041/ptsp_cig12/PTSP/.project
+END
+example_route.txt
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/epowley/!svn/ver/1041/ptsp_cig12/PTSP/example_route.txt
+END
+build.xml
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/epowley/!svn/ver/1041/ptsp_cig12/PTSP/build.xml
+END

@@ -1,0 +1,925 @@
+package controllers.mctsdriver;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import framework.core.Controller;
+import framework.core.Game;
+import framework.core.Ship;
+import framework.core.Waypoint;
+
+public class MctsDriverController extends Controller {
+
+	public static MctsDriverController ActiveMctsController = null;
+	
+	private final boolean VIS_PRETTY = true;
+	
+	private final boolean VIS_DRAW_EVALUATION = VIS_PRETTY;
+	private final boolean VIS_DRAW_ROUTE = VIS_PRETTY;
+	private final boolean VIS_DRAW_EXPLOITED = true;
+	private final boolean VIS_DRAW_EXPLOITED_NUMBERS = VIS_PRETTY;
+	
+	// private static int MCTS_ITERATIONS = 7;
+	
+	/** Whether to write a score.csv file with evaluations for the visited states.
+	 *  DON'T FORGET TO SET THIS TO FALSE BEFORE UPLOADING THE PLAYER!!! */
+	private final boolean WRITE_SCORE_CSV_FILE = false;
+	
+	/** The amount of time in ms for which the driver searches per turn. This should not be tuned. */
+	private long MCTS_TIME_LIMIT = 30;
+
+	/** If true, the driver waits for route planning to finish before setting off. */
+	private boolean WAIT_FOR_ROUTEPLANNER = false;
+	
+	/** If WAIT_FOR_ROUTEPLANNER is false, the amount of time in ms for which the driver searches per turn
+	 *  while the route planner is active. This balances the time budget between the route planner and the driver.
+	 *  Unlike MCTS_TIME_LIMIT, this should be tuned. */
+	private long MCTS_TIME_LIMIT_WHILE_ROUTEPLANNING = 20;
+	
+	/** UCB exploration constant for the driver. */ 
+	private double MCTS_EXPLORATION = 1.0;
+	
+	/** UCB exploration constant for the route planner. */
+	private double MCTS_ROUTEPLANNER_EXPLORATION = 20;
+	
+	/** TODO description */
+	private int MCTS_SIMULATION_LIMIT = 8;
+	
+	/** TODO description */
+	private int ROTATION_SUBDIVISIONS = 15;
+	
+	/** TODO description */
+	private int MCTS_STRAIGHT_MULTIPLIER = 1;
+
+	/** If true, only moves which apply thrust are present in the tree. */
+	private boolean ALWAYS_THRUSTING = false;
+	
+	/** TODO description */
+	public double EVAL_PATH_BONUS = 0.00;
+
+	/** TODO description */
+	public double EVAL_NAV_WEIGHT = 0.5;
+
+	/** TODO description */
+	private double EVAL_WAYPOINT_BONUS = 1.00;
+	
+	/** Multiplier for EVAL_WAYPOINT_BONUS for waypoints collected out of route order.
+	 *  1.0 = same reward as waypoints on the route
+	 *  0.0 = no reward for early collection
+	 *  < 0 = penalty for early collection
+	 */
+	private double EVAL_EARLY_WAYPOINT_WEIGHT = -0.5;
+	
+	private double EVAL_TIMEOUT_PENALTY = -1;
+
+	/** TODO description */
+	private double MCTS_DISCOUNT_FACTOR = 1.0;
+
+	/** TODO description */
+	private double EVAL_GREEDY_WEIGHT = 0.0000;//1;
+
+	/** TODO description */
+	private double EVAL_SPEED_WEIGHT = 0.25;
+
+	/** TODO description */
+	private double EVAL_SPEED_PENALTY = 0.0;
+	
+	/** TODO description */
+	private double EVAL_COLLISION_PENALTY = 0.5;
+	
+	public void SetParams(double[] params)
+	{
+		/*
+		m_routePlanner.WAYPOINT_TURN_PENALTY = params[0] * 300;
+		if (m_routePlanner.WAYPOINT_TURN_PENALTY < 0)
+			m_routePlanner.WAYPOINT_TURN_PENALTY = 0;
+		
+		m_routePlanner.m_graph.PATH_TURN_COST = params[1] * 3;
+		if (m_routePlanner.m_graph.PATH_TURN_COST < 0)
+			m_routePlanner.m_graph.PATH_TURN_COST = 0;
+		
+		if (params[2] > 5) m_routePlanner.m_graph.INCLUDE_KNIGHT_MOVES = true;
+		else m_routePlanner.m_graph.INCLUDE_KNIGHT_MOVES = false;*/
+		
+		MCTS_EXPLORATION = params[0] / 3;
+		if (MCTS_EXPLORATION < 0)
+			MCTS_EXPLORATION = 0;
+		
+		MCTS_ROUTEPLANNER_EXPLORATION = params[1] * 3;
+		if (MCTS_ROUTEPLANNER_EXPLORATION < 0)
+			MCTS_ROUTEPLANNER_EXPLORATION = 0;
+		
+		if (m_routePlanner instanceof AStarMctsPlanner)
+		{
+			int visitLimit = (int) Math.round(params[2] * 100);
+			if (visitLimit < 1)
+				visitLimit = 1;
+			((AStarMctsPlanner)m_routePlanner).MCTS_ROUTEPLANNER_VISIT_LIMIT = visitLimit;
+		}
+		
+		MCTS_SIMULATION_LIMIT = (int) Math.round(params[3] * 2);
+		if (MCTS_SIMULATION_LIMIT < 1)
+			MCTS_SIMULATION_LIMIT = 1;
+		
+		ROTATION_SUBDIVISIONS = (int) Math.round(params[4] * 6);
+		if (ROTATION_SUBDIVISIONS < 1)
+			ROTATION_SUBDIVISIONS = 1;
+		if (ROTATION_SUBDIVISIONS > 59)
+			ROTATION_SUBDIVISIONS = 59;
+		
+		/*if (params[5] > 5) ALWAYS_THRUSTING = true;
+		else */ALWAYS_THRUSTING = false;
+		
+		if (m_routePlanner instanceof AStarMctsPlanner)
+		{
+			AStarMctsPlanner rp = (AStarMctsPlanner)m_routePlanner;
+			rp.NAV_POINT_START_RADIUS = params[5] * 50;
+			if (rp.NAV_POINT_START_RADIUS < 1)
+				rp.NAV_POINT_START_RADIUS = 1;
+			
+			rp.NAV_POINT_END_RADIUS = params[6] * 50;
+			if (rp.NAV_POINT_END_RADIUS < 1)
+				rp.NAV_POINT_END_RADIUS = 1;
+		}
+		
+		MCTS_DISCOUNT_FACTOR = ( params[7] / 40) + 0.75;
+		if (MCTS_DISCOUNT_FACTOR > 1)
+			MCTS_DISCOUNT_FACTOR = 1;
+		if (MCTS_DISCOUNT_FACTOR < 0.75)
+			MCTS_DISCOUNT_FACTOR = 0.75;
+		
+		EVAL_PATH_BONUS =  params[8] / 10;
+		
+		EVAL_NAV_WEIGHT =  params[9] / 10;
+		
+		EVAL_WAYPOINT_BONUS =  params[10] / 3;
+		
+		EVAL_GREEDY_WEIGHT = params[11] / 1000;
+		
+		EVAL_SPEED_WEIGHT = params[12] / 20;
+		
+		EVAL_SPEED_PENALTY = params[13] / 10;
+		
+		EVAL_COLLISION_PENALTY =  params[14] / 5;
+	}
+	
+	private static int TURN_STEPS = (int)Math.round(Math.PI / Ship.steerStep);
+	
+	private class MetaAction
+	{
+		private int m_rotationSteps;
+		private int m_rotationDirection;
+		private boolean m_applyThrust;
+		
+		public MetaAction(int rotationSteps, int rotationDirection, boolean applyThrust)
+		{
+			m_rotationSteps = rotationSteps;
+			m_rotationDirection = rotationDirection;
+			m_applyThrust = applyThrust;;
+		}
+		
+		public int getNumSteps()
+		{
+			return m_rotationSteps;
+		}
+		
+		public int getDirection()
+		{
+			return m_rotationDirection;
+		}
+		
+		public boolean getApplyThrust()
+		{
+			return m_applyThrust;
+		}
+	}
+	
+	private class TreeNode
+	{
+		private TreeNode m_parent;
+		private List<TreeNode> m_children;
+		private MetaAction m_incomingAction;
+		
+		private int m_visits;
+		private double m_cumulativeReward;
+		
+		public TreeNode(TreeNode parent, MetaAction incomingAction)
+		{
+			m_parent = parent;
+			m_children = null;
+			m_incomingAction = incomingAction;
+			
+			m_visits = 0;
+			m_cumulativeReward = 0;
+		}
+		
+		public TreeNode GetParent()
+		{
+			return m_parent;
+		}
+		
+		public void SetChildren(List<MetaAction> childActions)
+		{
+			
+			m_children = new ArrayList<TreeNode>();
+			for (MetaAction a : childActions)
+				m_children.add(new TreeNode(this,a));
+		}
+		
+		public List<TreeNode> GetChildren()
+		{
+			return m_children;
+		}
+		
+		public MetaAction GetIncomingMetaAction()
+		{
+			return m_incomingAction;
+		}
+		
+		public void UpdateNode(double reward)
+		{
+			m_visits++;
+			m_cumulativeReward += reward;
+		}
+		
+		public void UpdateNode(double reward, double weight)
+		{
+			m_visits += weight;
+			m_cumulativeReward += weight*reward;
+		}
+		
+		public int GetVisits()
+		{
+			return m_visits;
+		}
+		
+		public double GetAverageReward()
+		{
+			return m_cumulativeReward / m_visits;
+		}
+		
+		public double GetExplorationUrgency()
+		{
+			return MCTS_EXPLORATION * Math.sqrt(Math.log(m_parent.GetVisits())/this.GetVisits());
+		}
+	}
+	
+	private Random rng;
+	
+	private List<MetaAction> m_actionList;
+	
+	private MetaAction m_currentMetaAction;
+	private int m_currentMetaActionStep;
+	
+	private TreeNode m_rootNode;
+	private Game m_rootGameState;
+	private int expectedTurns;
+	
+	private RoutePlanner m_routePlanner;
+	
+	private BufferedWriter m_scoreWriter;
+	
+	public MctsDriverController(Game a_game, long a_timeDue)
+	{
+		long startTime = System.currentTimeMillis();
+		ActiveMctsController = this;
+		rng = new Random(System.currentTimeMillis());
+		
+		/*if (WRITE_SCORE_CSV_FILE)
+		{
+			try
+			{
+				FileWriter fstream = new FileWriter("score.csv");
+				m_scoreWriter = new BufferedWriter(fstream);
+			}
+			catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}*/
+		
+		m_currentMetaAction = null;
+		
+		m_rootNode = new TreeNode(null,null);
+		
+		expectedTurns = 0;
+		
+		m_rootGameState = a_game.getCopy();
+
+		//double[] params = { 4.22180719723772 ,0.6009546865880636 ,3.450686104898931 ,3.64589598491344 ,2.5388598464542174 ,8.266951042196705 ,-0.6621246513050207 ,11.890112819709802 ,0.659564136492627 ,9.247992680326949 ,6.116716382322084 ,4.3763694520848295 ,10.320330677867139 ,3.4528446374909203 ,-0.23103295840317978  };
+		
+		//SetParams(params);
+		
+		m_actionList = GenerateActionList();
+		
+		System.out.println(String.format("%dms: m_routePlanner ctor starting ", System.currentTimeMillis() - startTime));
+		m_routePlanner = new FloodFillTspPlanner();
+		System.out.println(String.format("%dms: m_routePlanner ctor finished ", System.currentTimeMillis() - startTime));
+		
+		m_routePlanner.analyseMap(a_game, a_timeDue - 200);
+		System.out.println(String.format("%dms: analyseMap finished ", System.currentTimeMillis() - startTime));
+		
+		// startTime = System.currentTimeMillis();
+		
+		while (System.currentTimeMillis() + 200 < a_timeDue)
+		{
+			DoMcts(System.currentTimeMillis());
+		}
+	}
+	
+	public MctsDriverController(Game a_game, long a_timeDue, double[] params)
+	{
+		long startTime = System.currentTimeMillis();
+		
+		ActiveMctsController = this;
+		rng = new Random(System.currentTimeMillis());
+		
+		m_currentMetaAction = null;
+		
+		m_rootNode = new TreeNode(null,null);
+		
+		expectedTurns = 0;
+		
+		m_rootGameState = a_game.getCopy();
+
+		if (params != null)
+			SetParams(params);
+		
+		m_routePlanner = new AStarMctsPlanner(MCTS_ROUTEPLANNER_EXPLORATION);
+		
+		m_actionList = GenerateActionList();
+		
+		m_routePlanner.analyseMap(a_game, startTime + 990);
+		
+		/*while (System.currentTimeMillis() - startTime < 950)
+		{
+			DoMcts(System.currentTimeMillis() - startTime);
+		}*/
+	}
+	
+	boolean m_finishedRoutePlanning = false;
+	int m_lastWaypointCount = -1;
+	
+	@Override
+	public int getAction(Game a_game, long a_timeDue)
+	{
+		long startTime = System.currentTimeMillis();
+		
+		if (m_lastWaypointCount != a_game.getWaypointsVisited())
+		{
+			while (a_game.getWaypoints().get(m_routePlanner.getNextWaypoint()).isCollected())
+				m_routePlanner.advanceRoute();
+
+			m_lastWaypointCount = a_game.getWaypointsVisited();
+		}
+			
+		if (!m_finishedRoutePlanning && !m_routePlanner.isFinishedPlanning())
+		{
+			long timeDue = a_timeDue - MCTS_TIME_LIMIT_WHILE_ROUTEPLANNING;
+			if (WAIT_FOR_ROUTEPLANNER)
+				timeDue = a_timeDue;
+			
+			m_routePlanner.analyseMap(a_game, timeDue);
+			
+			if (WAIT_FOR_ROUTEPLANNER)
+				return 0;
+		}
+		else
+		{
+			m_finishedRoutePlanning = true;
+		}
+		
+		if (a_game.getTotalTime() != expectedTurns)
+		{
+			System.out.println("ACTION COUNT MISMATCH:");
+			System.out.print("Actual: ");
+			System.out.println(a_game.getTotalTime());
+			System.out.print("Expected: ");
+			System.out.println(expectedTurns);
+			
+			expectedTurns = a_game.getTotalTime();
+			m_rootNode = new TreeNode(null,null);
+			m_rootGameState = a_game.getCopy();
+			m_currentMetaAction = null;
+		}
+		
+		//if (m_currentMetaAction != null)
+		//	System.out.println(String.format("WP: %d to %d STEPS: %d of %d", a_game.getWaypointsVisited(),m_rootGameState.getWaypointsVisited(),m_currentMetaActionStep,m_currentMetaAction.getNumSteps()));
+		
+		if (m_currentMetaAction != null && m_currentMetaActionStep == m_currentMetaAction.getNumSteps())
+		{
+			
+			if (a_game.getShip().s.x != m_rootGameState.getShip().s.x || a_game.getShip().s.y != m_rootGameState.getShip().s.y)
+			{
+				System.out.println("POSITION MISMATCH:");
+				System.out.print("Actual: ");
+				System.out.println(a_game.getShip().s);
+				System.out.print("Expected: ");
+				System.out.println(m_rootGameState.getShip().s);
+				
+				m_rootNode = new TreeNode(null,null);
+				m_rootGameState = a_game.getCopy();
+				m_currentMetaAction = null;
+			}
+		}
+		
+		expectedTurns++;
+		
+		int returnCommand = -1;
+		
+		if (m_currentMetaAction != null)
+		{
+			if (m_currentMetaActionStep < m_currentMetaAction.getNumSteps())
+			{
+				returnCommand = GetNextMetaActionCommand(m_currentMetaAction,m_currentMetaActionStep);
+				
+				m_currentMetaActionStep++;
+			}
+			else
+				m_currentMetaAction = null;
+		}
+		
+		boolean mctsDone = false;
+		
+		if (m_currentMetaAction == null)
+		{
+			if (m_scoreWriter != null)
+			{
+				/*TreeNode currentNode = m_rootNode;
+				
+				while(currentNode.GetChildren() != null)
+				{
+					TreeNode bestNode = null;
+					int mostVisits = -1;
+					for (TreeNode c : currentNode.GetChildren())
+					{
+						if (c.GetVisits() > mostVisits)
+						{
+							mostVisits = c.GetVisits();
+							bestNode = c;
+						}
+					}
+					
+					currentNode = bestNode;
+				}*/
+				
+				try {
+					m_scoreWriter.write(String.format("%d,%f",
+							a_game.getWaypointsVisited(),
+							GetSimulationResult(a_game)
+					));
+					
+					if (m_rootNode != null && m_rootNode.GetChildren() != null)
+						for (TreeNode node : m_rootNode.GetChildren())
+						{
+							m_scoreWriter.write(String.format(",%f", node.m_cumulativeReward / node.m_visits));
+						}
+					m_scoreWriter.write("\n");
+					
+					m_scoreWriter.flush();
+				} catch (IOException e) { e.printStackTrace(); }
+			}
+			
+			if (m_rootNode.GetChildren() == null)
+			{
+				DoMcts(startTime);
+				mctsDone = true;
+			}
+			
+			// If the search timed out before it even started, skip the turn
+			if (m_rootNode.GetChildren() == null)
+				return 0;
+			
+			TreeNode bestChild = null;
+			int mostVisits = Integer.MIN_VALUE;
+			
+			for (TreeNode child : m_rootNode.GetChildren())
+			{
+				if (child.GetVisits() > mostVisits)
+				{
+					bestChild = child;
+					mostVisits = child.GetVisits();
+				}
+			}
+			
+			m_visits = m_rootNode.GetVisits();
+			//m_rootNode = bestChild;
+			m_rootNode = new TreeNode(null,null);
+			
+			ApplyMetaAction(m_rootGameState,bestChild.GetIncomingMetaAction());
+			//System.out.println(String.format("WP: %d STEPS: %d", m_rootGameState.getWaypointsVisited(),bestChild.GetIncomingMetaAction().getNumSteps()));
+			
+			SetNewMetaAction(bestChild.GetIncomingMetaAction());
+			
+			returnCommand = GetNextMetaActionCommand(m_currentMetaAction,m_currentMetaActionStep);
+			m_currentMetaActionStep++;
+		}
+		
+		if (!mctsDone)
+			DoMcts(startTime);
+		
+		return returnCommand;
+	}
+	
+	private void SetNewMetaAction(MetaAction a)
+	{
+		m_currentMetaAction = a;
+		m_currentMetaActionStep = 0;
+	}
+	
+	private int GetNextMetaActionCommand(MetaAction a, int s)
+	{
+		int nextAction = ACTION_NO_FRONT;
+		
+		if (s < a.getNumSteps())
+		{
+			if (a.getDirection() < 0)
+				nextAction = ACTION_NO_LEFT;
+			else if (a.getDirection() > 0)
+				nextAction = ACTION_NO_RIGHT;
+			
+			if (a.getApplyThrust())
+				nextAction += 3;
+		}
+		
+		return nextAction;
+	}
+	
+	private void ApplyMetaAction(Game gameState, MetaAction a)
+	{
+		int currentMetaActionStep = 0;
+
+		while (currentMetaActionStep < a.getNumSteps() && !gameState.isEnded())
+		{
+			gameState.tick(GetNextMetaActionCommand(a,currentMetaActionStep));
+			currentMetaActionStep++;
+		}
+	}
+	
+	private List<MetaAction> GenerateActionList()
+	{
+		List<MetaAction> actions = new ArrayList<MetaAction>();
+		
+		/*for (int r = 0; r <= ROTATION_SUBDIVISIONS; r++)
+		{
+			for (int d = -1; d< 2; d+= 2)
+			{
+				if (r == 0 && d == 1 || r == ROTATION_SUBDIVISIONS && d == 1)
+					continue;
+				
+				int direction = d;
+				if (r == 0)
+					direction = 0;
+				
+				int numSteps = r * (TURN_STEPS / ROTATION_SUBDIVISIONS);
+				if (numSteps == 0)
+					numSteps = MCTS_STRAIGHT_MULTIPLIER * TURN_STEPS / ROTATION_SUBDIVISIONS;
+				
+				actions.add(new MetaAction(numSteps,direction,true));
+				if (!ALWAYS_THRUSTING)
+					actions.add(new MetaAction(numSteps,direction,false));
+			}
+		}*/
+		
+		actions.add(new MetaAction(ROTATION_SUBDIVISIONS,-1,true));
+		actions.add(new MetaAction(MCTS_STRAIGHT_MULTIPLIER * ROTATION_SUBDIVISIONS,0,true));
+		actions.add(new MetaAction(ROTATION_SUBDIVISIONS,1,true));
+		/*if (!ALWAYS_THRUSTING)*/
+		{
+			actions.add(new MetaAction(ROTATION_SUBDIVISIONS,-1,false));
+			actions.add(new MetaAction(MCTS_STRAIGHT_MULTIPLIER * ROTATION_SUBDIVISIONS,0,false));
+			actions.add(new MetaAction(ROTATION_SUBDIVISIONS,1,false));
+		}
+		
+		return actions;
+	}
+
+	private void DoMcts(long mctsStartMillis)
+	{
+		long averageIterationMillis = 0;
+		int iterations = 0;
+		
+		while ((System.currentTimeMillis()-mctsStartMillis) + averageIterationMillis < MCTS_TIME_LIMIT)
+		{
+			long iterationStartMillis = System.currentTimeMillis();
+			
+			Game currentState = m_rootGameState.getCopy();
+			TreeNode currentNode = m_rootNode;
+			int currentDepth = 0;
+			
+			while (currentNode.GetChildren() != null && currentDepth < MCTS_SIMULATION_LIMIT)
+			{
+				currentNode = DoSelection(currentNode);
+				ApplyMetaAction(currentState, currentNode.GetIncomingMetaAction());
+				currentDepth += 1;
+			}
+			
+			if (!currentState.isEnded() && currentDepth < MCTS_SIMULATION_LIMIT)
+			{
+				TreeNode newNode = DoExpansion(currentNode);
+				if (newNode != null)
+				{
+					currentNode = newNode;
+					ApplyMetaAction(currentState, currentNode.GetIncomingMetaAction());
+					currentDepth += 1;
+				}
+			}
+			
+			double simulationResult = DoSimulation(currentState,currentDepth);
+			
+			//double weight = (currentDepth + 1 / (double)MCTS_SIMULATION_LIMIT);
+			DoBackPropagation(currentNode,simulationResult);
+			
+			long timeTaken = System.currentTimeMillis() - iterationStartMillis;
+			if (timeTaken > averageIterationMillis)
+				averageIterationMillis = timeTaken;
+			//averageIterationMillis += ((1.0 / (iterations + 1)) * (System.currentTimeMillis() - iterationStartMillis)) + ((iterations/(iterations + 1)* averageIterationMillis));
+			iterations++;
+		}
+	}
+	
+	private TreeNode DoSelection(TreeNode node)
+	{
+		ArrayList<TreeNode> bestNodes = new ArrayList<TreeNode>();
+		double bestScore = Double.MAX_VALUE * -1;
+		
+		for (TreeNode child : node.GetChildren())
+		{
+			double childScore = Double.MAX_VALUE * -1;
+			if (child.GetVisits() == 0)
+				childScore = Double.MAX_VALUE - rng.nextDouble();
+			else
+				childScore = child.GetAverageReward() + child.GetExplorationUrgency();
+			
+			if (childScore > bestScore)
+			{
+				bestNodes.clear();
+				bestScore = childScore;
+				bestNodes.add(child);
+			}
+			else if (childScore == bestScore)
+				bestNodes.add(child);
+		}
+		
+		return bestNodes.get(rng.nextInt(bestNodes.size()));
+	}
+	
+	private TreeNode DoExpansion(TreeNode leaf)
+	{
+		leaf.SetChildren(m_actionList);
+		
+		return leaf.GetChildren().get(rng.nextInt(m_actionList.size()));
+	}
+	
+	private double calculateClosestWaypointDistance(Game a_gameCopy)
+    {
+        double minDistance = Double.MAX_VALUE;
+        for(Waypoint way: a_gameCopy.getWaypoints())
+        {
+            if(!way.isCollected())     //Only consider those not collected yet.
+            {
+                double fx = way.s.x-a_gameCopy.getShip().s.x, fy = way.s.y-a_gameCopy.getShip().s.y;
+                double dist = Math.sqrt(fx*fx+fy*fy);
+                if( dist < minDistance )
+                {
+                    //Keep the minimum distance.
+                    minDistance = dist;
+                }
+            }
+        }
+        
+        return minDistance;
+    }
+	
+	private double DoSimulation(Game leafGameState, int initialDepth)
+	{	
+		int currentDepth = initialDepth;
+		while (!leafGameState.isEnded() && currentDepth < MCTS_SIMULATION_LIMIT)
+		{
+			MetaAction action = m_actionList.get(rng.nextInt(m_actionList.size()));
+			
+			ApplyMetaAction(leafGameState,action);
+			currentDepth+= 1;
+		}
+		
+		if (leafGameState.getWaypointsLeft() == 0)
+			//return leafGameState.getWaypoints().size() * EVAL_WAYPOINT_BONUS * 2;
+			//return GetSimulationResult(leafGameState) * 2;
+			return (leafGameState.getWaypoints().size() * EVAL_WAYPOINT_BONUS * 2)-Math.min(9000,((3* leafGameState.getTotalTime())/1000));
+		
+		return GetSimulationResult(leafGameState);
+	}
+	
+	private double GetSimulationResult(Game leafGameState)
+	{
+		//return leafGameState.getWaypointsVisited() - 0.0001 * calculateClosestWaypointDistance(leafGameState);
+		
+		int routeWaypoints = 0;
+		for (int wp : m_routePlanner.getRoute())
+		{
+			if (leafGameState.getWaypoints().get(wp).isCollected())
+				routeWaypoints++;
+			else
+				break;
+		}
+		
+		double result = EVAL_WAYPOINT_BONUS * routeWaypoints;
+		//result += EVAL_WAYPOINT_BONUS * EVAL_EARLY_WAYPOINT_WEIGHT * (leafGameState.getWaypointsVisited() - routeWaypoints);
+		
+		double routeEval = /*EVAL_PATH_BONUS + */m_routePlanner.getEvaluation(leafGameState) * EVAL_NAV_WEIGHT;
+		//routeEval = Math.max(0, Math.min(routeEval, 1)); // Clamp routeEval to [0,1]
+		result += routeEval;
+		
+		/*if (leafGameState.getShip().getCollLastStep())
+		{
+			result -= EVAL_COLLISION_PENALTY;
+		}*/
+		
+		//result -= EVAL_GREEDY_WEIGHT * leafGameState.getShip().s.dist(leafGameState.getWaypoints().get(m_routePlanner.getNextWaypoint()).s);
+		
+		result += EVAL_SPEED_WEIGHT * (leafGameState.getShip().v.mag() - EVAL_SPEED_PENALTY);
+		
+		if (leafGameState.isEnded() && leafGameState.getWaypointsLeft() > 0)
+		{
+			result += EVAL_TIMEOUT_PENALTY;
+		}
+		
+		return result;
+	}
+	
+	private void DoBackPropagation(TreeNode leaf, double simulationResult)
+	{
+		for (TreeNode n = leaf; n != null; n=n.GetParent())
+		{
+			n.UpdateNode(simulationResult);
+			//simulationResult *= MCTS_DISCOUNT_FACTOR;
+		}
+	}
+	
+	private void DoBackPropagation(TreeNode leaf, double simulationResult, double weight)
+	{
+		for (TreeNode n = leaf; n != null; n=n.GetParent())
+		{
+			n.UpdateNode(simulationResult,weight);
+			//simulationResult *= MCTS_DISCOUNT_FACTOR;
+		}
+	}
+	
+	BufferedImage m_rewardImage = null;
+	int m_rewardImageLastWaypointCount = -1;
+	
+	class RewardImageUpdater extends Thread
+	{
+		Game copy;
+		
+		public RewardImageUpdater(Game game)
+		{
+			copy = game;
+		}
+		
+		@Override
+		public void run() 
+		{
+			for (int wh = 8; wh > 0; wh /= 2)
+			{			
+				double[][] fitnessValues = new double[copy.getMapSize().width / wh + 1][copy.getMapSize().height / wh + 1];
+				double minFitness = Double.POSITIVE_INFINITY;
+				double maxFitness = Double.NEGATIVE_INFINITY;
+				
+				for (int x=0; x<copy.getMapSize().width; x+=wh)
+				{
+					for (int y=0; y<copy.getMapSize().height; y+=wh)
+					{
+						if (!copy.getMap().isObstacle(x, y))
+						{
+							copy.getShip().s.x = x;
+							copy.getShip().s.y = y;
+							copy.getShip().v.x = copy.getShip().v.y = 0;
+							
+							double fitnessValue = GetSimulationResult(copy);
+							fitnessValues[x/wh][y/wh] = fitnessValue;
+							if (fitnessValue < minFitness) minFitness = fitnessValue;
+							if (fitnessValue > maxFitness) maxFitness = fitnessValue;
+						}
+					}
+				}
+					
+				for (int x=0; x<copy.getMapSize().width; x+=wh)
+				{
+					for (int y=0; y<copy.getMapSize().height; y+=wh)
+					{
+						if (!copy.getMap().isObstacle(x, y))
+						{
+							double fitness = fitnessValues[x/wh][y/wh];
+							
+							double v = (fitness - minFitness) / (maxFitness - minFitness);
+							int rgb = 0xC0000000 + Color.HSBtoRGB((float)(0.8*v), 1.0f, 0.5f);
+
+							for (int x2=x; x2<x+wh && x2<copy.getMapSize().width; x2++)
+								for (int y2=y; y2<y+wh && y2<copy.getMapSize().height; y2++)
+								m_rewardImage.setRGB(x2, y2, rgb);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	RewardImageUpdater m_rewardImageUpdater = null;
+	private int m_visits = 0;
+	
+	public void DrawExploited(Graphics2D g)
+	{
+		Game copy;
+		
+		if (VIS_DRAW_EVALUATION)
+		{
+			copy = m_rootGameState.getCopy();
+			
+			if (m_rewardImage == null)
+				m_rewardImage = new BufferedImage(copy.getMapSize().width, copy.getMapSize().height, BufferedImage.TYPE_INT_ARGB);
+	
+			if (/*m_finishedRoutePlanning &&*/ copy.getWaypointsVisited() != m_rewardImageLastWaypointCount && copy.getWaypointsLeft() > 0)
+			{
+				if (m_rewardImageUpdater != null)
+					m_rewardImageUpdater.stop();
+				
+				m_rewardImageUpdater = new RewardImageUpdater(copy);
+				m_rewardImageUpdater.start();
+				
+				m_rewardImageLastWaypointCount = m_rootGameState.getWaypointsVisited();
+			}
+			
+			//synchronized(m_rewardImage)
+			{
+				g.drawImage(m_rewardImage, 0, 0, null);
+			}
+		}
+		
+		if (VIS_DRAW_ROUTE)
+		{
+			// Draw route
+			m_routePlanner.draw(g);
+		}
+		
+		if (VIS_DRAW_EXPLOITED)
+		{
+			copy = m_rootGameState.getCopy();
+			if (m_rootNode != null)
+			{
+				TreeNode currentNode = m_rootNode;
+				
+				double posx = copy.getShip().ps.x;
+				double posy = copy.getShip().ps.y;
+				
+				g.setColor(Color.yellow);
+				
+				while(currentNode.GetChildren() != null)
+				{
+					TreeNode bestNode = null;
+					int mostVisits = -1;
+					for (TreeNode c : currentNode.GetChildren())
+					{
+						if (c.GetVisits() > mostVisits)
+						{
+							mostVisits = c.GetVisits();
+							bestNode = c;
+						}
+					}
+					
+					ApplyMetaAction(copy,bestNode.GetIncomingMetaAction());
+					double newposx = copy.getShip().ps.x;
+					double newposy = copy.getShip().ps.y;
+					
+					g.drawLine((int)posx, (int)posy, (int)newposx, (int)newposy);
+					
+					if (VIS_DRAW_EXPLOITED_NUMBERS)
+					{
+						g.setFont(new Font("Arial", Font.PLAIN, 10));
+						g.drawString(String.format("  %.4f", currentNode.m_cumulativeReward / currentNode.m_visits), (int)newposx, (int)newposy);
+					}
+					
+					posx = newposx;
+					posy = newposy;
+					
+					currentNode = bestNode;
+				}
+				
+				g.setColor(Color.CYAN);
+		        g.setFont(new Font("Courier", Font.PLAIN, 16));
+				g.drawString(String.format("Trials: %d", m_visits),200,20);
+				g.setColor(Color.YELLOW);
+			}
+		}
+	}
+}

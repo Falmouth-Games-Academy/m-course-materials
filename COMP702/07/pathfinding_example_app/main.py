@@ -193,7 +193,7 @@ def main():
             if event.type == pygame.QUIT or event.type == pygame.KEYDOWN:
                 break
 
-        do_string_pull = True
+        do_string_pull = False
         if path is not None and do_string_pull:
             string_pull(the_map, screen, path)
 
