@@ -23,10 +23,10 @@ def fast_sleep():
         last_sleep_time = time.perf_counter()
 
 
-#sleep = slow_sleep
+sleep = slow_sleep
 #sleep = fast_sleep
-def sleep():
-    pass
+#def sleep():
+#    pass
 
 
 class Board:
@@ -228,7 +228,7 @@ def main():
     pygame.init()
     clock = pygame.time.Clock()
 
-    board = Board("puzzle_hard.txt")
+    board = Board("puzzle_easy.txt")
 
     window_width = 9 * tile_size
     window_height = 9 * tile_size
@@ -240,9 +240,15 @@ def main():
     board.draw(screen)
     pygame.display.flip()
 
-    #solve_backtracking(screen, board, 0, 0)
+    # Wait for keypress
+    while True:
+        event = pygame.event.wait()
+        if event.type == pygame.KEYDOWN:
+            break
+
+    solve_backtracking(screen, board, 0, 0)
     #solve_constraint_propagation(screen, board)
-    solve_combined(screen, board)
+    #solve_combined(screen, board)
 
     board.draw(screen)
     pygame.display.flip()
