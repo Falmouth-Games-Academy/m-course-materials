@@ -1,0 +1,52 @@
+% !TeX root = ./2020-21-COMP702-12-lecture-materials.tex
+% Adjust these for the path of the theme and its graphics, relative to this file
+%\usepackage{beamerthemeFalmouthGamesAcademy}
+\usepackage{../../beamerthemeFalmouthGamesAcademy}
+\usepackage{multimedia}
+\graphicspath{ {../../} }
+
+% Default language for code listings
+\lstset{language=Python
+}
+
+% For strikethrough effect
+\usepackage[normalem]{ulem}
+\usepackage{wasysym}
+
+\usepackage{pdfpages}
+\usepackage{algpseudocode}
+
+% http://www.texample.net/tikz/examples/state-machine/
+\usetikzlibrary{arrows,automata}
+
+\input{sessioninfo}
+
+\hypersetup{
+pdftex,
+pdftitle=\sessionnumber: Introduction to Python,
+pdfauthor=Ed Powley,
+pdfdisplaydoctitle,
+pdflang=en-GB
+}
+
+\begin{document}
+\title{\sessionnumber: Introduction to Python}
+\subtitle{\modulecode: \moduletitle}
+
+\frame{\titlepage} 
+
+\input{installing}
+\input{python_intro}
+\input{pygame}
+
+\part{Workshop}
+\frame{\partpage}
+
+\begin{frame}{Workshop}
+    \begin{itemize}
+        \item Begin working through the Python resources linked on LearningSpace
+        \item Suggested Christmas project: use Pygame to reimplement your favourite 80s arcade game!
+    \end{itemize}
+\end{frame}
+
+\end{document}

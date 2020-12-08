@@ -1,0 +1,33 @@
+\part{Pygame}
+\frame{\partpage}
+
+\begin{frame}{Pygame}
+    \begin{itemize}
+        \pause\item 2D game development library
+        \pause\item Based on SDL (Simple DirectMedia Layer)
+        \pause\item Allows low-level control over the game loop
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{The main game loop}
+    \pause Most main loops in games follow the same basic pattern:
+    \pause
+    \begin{algorithmic}
+        \Repeat
+            \pause \State handle events
+            \pause \State update game state
+            \pause \State draw graphics
+            \pause \State sleep to maintain frame rate
+            \pause \State swap buffers
+        \pause \Until{``quit'' event received}
+    \end{algorithmic}
+\end{frame}
+
+\begin{frame}{Double buffering}
+    \begin{itemize}
+        \pause\item Pygame (and other frameworks) use \textbf{two} graphics buffers
+        \pause\item One is displayed on the screen
+        \pause\item The other is used to draw the next frame
+        \pause\item When drawing is finished, they are \textbf{swapped} --- the drawn buffer is displayed, and the old buffer is used to draw the next frame
+    \end{itemize}
+\end{frame}

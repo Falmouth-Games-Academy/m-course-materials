@@ -1,0 +1,154 @@
+\part{Python for C\# programmers}
+\frame{\partpage}
+
+\begin{frame}[fragile]{Hello World}
+    \begin{lstlisting}
+print("Hello, world!")
+    \end{lstlisting}
+    \begin{itemize}
+        \pause\item Code does not have to be inside a class or function
+        \pause\item No semicolons
+        \pause\item \lstinline{print} is a built-in function
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Comments}
+    \begin{lstlisting}
+# This is a comment
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Variables}
+    \begin{lstlisting}
+a = 1
+b = 2
+c = a + b
+    \end{lstlisting}
+    \begin{itemize}
+        \pause\item Variables do not need to be declared
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Variables}
+    \begin{lstlisting}
+x = 7
+x = "Hello"
+    \end{lstlisting}
+    \begin{itemize}
+        \pause\item Variables can hold values of any type
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{If statement}
+    \begin{lstlisting}
+if x < 10:
+    print("asdf")
+elif x < 20:
+    print("qwerty")
+else:
+    print("zxcv")
+    \end{lstlisting}
+    \begin{itemize}
+        \pause\item Indentation matters
+        \pause\item Note the colons and the lack of parentheses
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Lists}
+    \begin{lstlisting}
+my_list = ["Hello", "World", "Foo", 42]
+print(my_list[0])
+    \end{lstlisting}
+    \begin{itemize}
+        \pause\item Can store values of any type
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{For loop}
+    \begin{lstlisting}
+for x in my_list:
+    print(x)
+    \end{lstlisting}
+    \begin{itemize}
+        \pause\item Works like \lstinline{foreach} in C\#
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{For loop}
+    \begin{lstlisting}
+for i in range(10):
+    print(i)
+    \end{lstlisting}
+    \begin{itemize}
+        \pause\item Python doesn't have C-style \lstinline{for} loops
+        \pause\item Built-in function \lstinline{range(n)} gives numbers from $0$ to $n-1$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Functions}
+    \begin{lstlisting}
+def add(a, b):
+    return a + b
+    \end{lstlisting}
+    \begin{itemize}
+        \pause\item Can return any value, or nothing
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Functions are values}
+    \begin{lstlisting}
+def add(a, b):
+    return a + b
+
+x = add
+
+print(x(3, 4))
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Classes}
+    \begin{lstlisting}
+class Thing:
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
+
+    def add(self):
+        return self.a + self.b
+
+x = Thing(2, 3)
+    \end{lstlisting}
+    \begin{itemize}
+        \pause\item \lstinline{__init__} is the constructor
+        \pause\item \lstinline{self} is equivalent to \lstinline{this}
+        \pause\item \lstinline{self} is never implicit, unlike \lstinline{this}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{List comprehensions}
+    \begin{lstlisting}
+my_list = [1, 3, 6, 10]
+my_other_list = [x*2 for x in my_list if x < 10]
+    \end{lstlisting}
+    \begin{itemize}
+        \pause\item Similar to LINQ queries in C\#
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Python and C}
+    \begin{itemize}
+        \pause\item Python has many advantages, but speed is not one of them...
+        \pause\item For intensive calculations we generally rely on external libraries written in C/C++
+        \pause\item It is also possible to embed the Python interpreter in a C/C++ program
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Useful libraries}
+    \begin{itemize}
+        \pause\item \textbf{NumPy}: fast calculation with $N$-dimensional numerical arrays
+        \pause\item \textbf{SciPy}: various scientific tools, including statistical analysis
+        \pause\item \textbf{Pandas}: importing and manipulation of large datasets
+        \pause\item \textbf{Matplotlib}: plotting of charts and graphs
+        \pause\item Various libraries for machine learning, which you will learn about in COMP704...
+    \end{itemize}
+\end{frame}
