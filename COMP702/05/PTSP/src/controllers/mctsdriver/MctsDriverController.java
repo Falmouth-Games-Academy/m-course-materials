@@ -21,7 +21,7 @@ public class MctsDriverController extends Controller {
 
 	public static MctsDriverController ActiveMctsController = null;
 	
-	private final boolean VIS_PRETTY = true;
+	private final boolean VIS_PRETTY = false;
 	
 	private final boolean VIS_DRAW_EVALUATION = VIS_PRETTY;
 	private final boolean VIS_DRAW_ROUTE = VIS_PRETTY;

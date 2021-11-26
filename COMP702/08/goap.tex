@@ -70,14 +70,23 @@
 
 \begin{frame}{Finding the plan}
     \begin{itemize}
-        \pause\item As in STRIPS, we can build a \textbf{tree} whose nodes are world states and edges are available actions
-        \pause\item Since actions have costs, we can use A* to find the lowest cost path to the goal
+        \pause\item As in STRIPS, we can build a \textbf{state-action graph}
+        \pause\item Since actions have costs, we can use \textbf{Dijkstra's algorithm} to find the lowest cost path to the goal
+        \pause\item (or A* if we can find a suitable heuristic)
         \pause\item Plan is a \textbf{queue} of actions that the agent then executes
         \pause\item If the plan is interrupted or fails then the agent can \textbf{replan}
     \end{itemize}
 \end{frame}
 
-\begin{frame}{GOAP vs behaviour trees}
+\begin{frame}{Using GOAP}
+    \begin{itemize}
+        \pause\item Planning is suitable when achieving a goal requires a specific \textbf{sequence of actions}
+        \pause\item Especially when the plan is not obvious, or when you want to let the plan be \textbf{emergent}
+        \pause\item Does require \textbf{abstraction} in a real-time videogame setting, though STRIPS-like definitions give a useful framework for this
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{``AAA game AI'' compared:\\GOAP vs behaviour trees}
     \begin{itemize}
         \pause\item BT: Designer specifies ``how''
         \pause\item GOAP: Designer specifies ``what'' --- ``how'' is in whatever system is used to implement
